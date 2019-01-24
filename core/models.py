@@ -12,7 +12,7 @@ db.bind('sqlite',
 
 class Device(db.Entity):
     """
-    Class to handle Devices running
+    Class to keep tracking of status changing over time
     """
     mac_addr = PrimaryKey(str, auto=True)
     name = Required(str)
@@ -23,13 +23,13 @@ class Device(db.Entity):
 
 class ConnectTime(db.Entity):
     """
-    Class to keep tracking of status changing over time
+    Class to handle Devices running
     """
     id = PrimaryKey(UUID, auto=True)
     lease_time = Required(str)
     time = Required(datetime)
     transition = Optional(int, default=0)
-    person = Required(Device)
+    device = Required(Device)
 
 
 db.generate_mapping(create_tables=True)
