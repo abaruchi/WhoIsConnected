@@ -1,2 +1,41 @@
 """ Routines and Classes to get information about devices in network
 """
+
+import re
+from ipaddress import IPv4Address
+
+import requests
+
+from .config_reader import ConfigData
+from .regex import MySystemRegex
+
+
+def get_mac_vendor(mac_addr):
+    """
+    Routine to identify the vendor of a given mac address
+    Ref.: https://macvendors.co/api/python
+
+    :param mac_addr: The mac address to check (str)
+    :return: Mac Address vendor (str)
+    """
+    mac_regex = MySystemRegex()
+    mac_validation = re.compile(mac_regex.mac_addr())
+
+    if not mac_validation.match(mac_addr):
+        return "None"
+
+    config = ConfigData()
+    network_config = config.get_network_info()
+    mac_addr_url = network_config['network']['mac_url']
+
+    r = requests.get(mac_addr_url % mac_addr)
+    return r.json()['result']['company']
+
+
+def check_device_status(ip_addr):
+    """
+    Returns if a given device - ip addr - is online of not
+    :param ip_addr: An IP Addr (IPv4 or IPv6 Object)
+    :return: Online or Offline (str)
+    """
+    return 'online'
