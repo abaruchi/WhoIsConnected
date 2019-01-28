@@ -14,7 +14,7 @@ class Device(db.Entity):
     """
     Class to keep tracking of status changing over time
     """
-    mac_addr = PrimaryKey(str, auto=True)
+    mac_addr = PrimaryKey(str)
     name = Required(str)
     eth_vendor = Optional(str)
     cur_status = Required(str)
@@ -25,7 +25,7 @@ class ConnectTime(db.Entity):
     """
     Class to handle Devices running
     """
-    id = PrimaryKey(UUID, auto=True)
+    id = PrimaryKey(UUID)
     lease_time = Required(str)
     time = Required(datetime)
     transition = Optional(int, default=0)
