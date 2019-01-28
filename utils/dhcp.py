@@ -2,7 +2,7 @@
 """
 
 import re
-from ipaddress import AddressValueError, IPv4Address, IPv6Address
+from ipaddress import IPv4Address, IPv6Address
 
 from .config_reader import ConfigData
 from .regex import MySystemRegex
