@@ -314,3 +314,4 @@ modules.xml
 .venv/
 
 # End of https://www.gitignore.io/api/flask,python,django,pycharm+all
+whoisconnected
