@@ -16,6 +16,8 @@ class Device(db.Entity):
     """
     mac_addr = PrimaryKey(str)
     name = Required(str)
+    ip_addr_v4 = Optional(str)
+    ip_addr_v6 = Optional(str)
     eth_vendor = Optional(str)
     cur_status = Required(str)
     connect_times = Set('ConnectTime')
