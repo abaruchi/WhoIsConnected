@@ -1,9 +1,9 @@
 """ Routines and Classes to get information about devices in network
 """
 
-import re
-from ipaddress import IPv4Address
+from ipaddress import IPv4Address, IPv6Address
 
+import command
 import requests
 
 from .config_reader import ConfigData
@@ -38,4 +38,19 @@ def check_device_status(ip_addr):
     :param ip_addr: An IP Addr (IPv4 or IPv6 Object)
     :return: Online or Offline (str)
     """
-    return 'online'
+
+    if isinstance(ip_addr, IPv4Address):
+        ip_to_ping = str(ip_addr)
+        r = command.run(['ping','-c', '1', ip_to_ping])
+        if r.exit == 0:
+            return "Online"
+        return "Offline"
+
+    elif isinstance(ip_addr, IPv6Address):
+        ip_to_ping = str(ip_addr)
+        r = command.run(['ping6', '-c', '1', ip_to_ping])
+        if r.exit == 0:
+            return "Online"
+        return "Offline"
+
+    return "Offline"
