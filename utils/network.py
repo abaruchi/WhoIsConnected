@@ -1,9 +1,10 @@
 """ Routines and Classes to get information about devices in network
 """
 
+import re
 from ipaddress import IPv4Address, IPv6Address
 
-import command
+from command import run, CommandException
 import requests
 
 from .config_reader import ConfigData
@@ -29,7 +30,11 @@ def get_mac_vendor(mac_addr):
     mac_addr_url = network_config['network']['mac_url']
 
     r = requests.get(mac_addr_url % mac_addr)
-    return r.json()['result']['company']
+    try:
+        response = r.json()['result']['company']
+    except KeyError:
+        return "None"
+    return response
 
 
 def check_device_status(ip_addr):
@@ -41,14 +46,21 @@ def check_device_status(ip_addr):
 
     if isinstance(ip_addr, IPv4Address):
         ip_to_ping = str(ip_addr)
-        r = command.run(['ping','-c', '1', ip_to_ping])
+        try:
+            r = run(['ping', '-c', '1', ip_to_ping])
+        except CommandException:
+            return "Offline"
+
         if r.exit == 0:
             return "Online"
         return "Offline"
 
     elif isinstance(ip_addr, IPv6Address):
         ip_to_ping = str(ip_addr)
-        r = command.run(['ping6', '-c', '1', ip_to_ping])
+        try:
+            r = run(['ping', '-c', '1', ip_to_ping])
+        except CommandException:
+            return "Offline"
         if r.exit == 0:
             return "Online"
         return "Offline"
