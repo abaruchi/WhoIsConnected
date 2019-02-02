@@ -2,3 +2,5 @@ pony==0.7.2
 google-api-python-client==1.7.7
 configparser==3.7.1
 Command==0.1.0
+requests==2.21.0
+requests-mock==1.5.2
