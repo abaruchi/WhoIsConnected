@@ -1,0 +1,26 @@
+checks:
+    python:
+        code_rating: true
+        duplicate_code: true
+filter:
+    paths: ['core/*', 'tests/*', 'utils/*']
+    excluded_paths:
+        - 'sql_schema/*'
+build:
+    environment:
+        python: 3.6.0
+        postgresql: false
+        redis: false
+    tests:
+        override:
+            -
+                command: 'tox'
+                coverage:
+                    file: '.coverage'
+                    config_file: '.coveragerc'
+                    format: 'py-cc'
+    nodes:
+        analysis:
+            tests:
+                override:
+                    - py-scrutinizer-run
