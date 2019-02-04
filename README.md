@@ -1,6 +1,6 @@
 # WhoIsConnected
 
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/abaruchi/WhoIsConnected/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/abaruchi/WhoIsConnected/?branch=master) [![MIT Licence](https://badges.frapsoft.com/os/mit/mit.svg?v=103)](https://opensource.org/licenses/mit-license.php)
+[![Codacy Badge](https://api.codacy.com/project/badge/Coverage/23a523978b6a457e9e9d5d2cef3c91fb)](https://www.codacy.com/app/abaruchi/WhoIsConnected?utm_source=github.com&utm_medium=referral&utm_content=abaruchi/WhoIsConnected&utm_campaign=Badge_Coverage) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/23a523978b6a457e9e9d5d2cef3c91fb)](https://www.codacy.com/app/abaruchi/WhoIsConnected?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=abaruchi/WhoIsConnected&amp;utm_campaign=Badge_Grade) [![MIT Licence](https://badges.frapsoft.com/os/mit/mit.svg?v=103)](https://opensource.org/licenses/mit-license.php)
 
 ## Contents
 1. [Introduction](#introduction)
