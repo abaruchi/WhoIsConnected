@@ -1,10 +1,10 @@
 """ Routines and Classes to get information about devices in network
 """
 
+import os
 import re
 from ipaddress import IPv4Address, IPv6Address
 
-from command import run, CommandException
 import requests
 
 from .config_reader import ConfigData
@@ -46,23 +46,14 @@ def check_device_status(ip_addr):
 
     if isinstance(ip_addr, IPv4Address):
         ip_to_ping = str(ip_addr)
-        try:
-            r = run(['ping', '-c', '1', ip_to_ping])
-        except CommandException:
-            return "Offline"
-
-        if r.exit == 0:
+        r = os.system("ping -c 1 " + ip_to_ping + " > /dev/null")
+        if r == 0:
             return "Online"
         return "Offline"
 
     elif isinstance(ip_addr, IPv6Address):
         ip_to_ping = str(ip_addr)
-        try:
-            r = run(['ping', '-c', '1', ip_to_ping])
-        except CommandException:
-            return "Offline"
-        if r.exit == 0:
+        r = os.system("ping6 -c 1" + ip_to_ping + " > /dev/null")
+        if r == 0:
             return "Online"
         return "Offline"
-
-    return "Offline"
