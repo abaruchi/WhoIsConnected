@@ -4,8 +4,6 @@ from unittest import mock
 from unittest.mock import patch
 import requests_mock
 
-from command import Command, run
-
 from utils.network import check_device_status, get_mac_vendor
 
 
@@ -48,15 +46,22 @@ class TestNetwork(unittest.TestCase):
             vendor = get_mac_vendor(self.wrong_mac_vendor)
         self.assertEqual(vendor, "None")
 
-    def test_host_ipv4_is_up(self):
-        pass
+    @patch('os.system', return_value=0)
+    def test_host_ipv4_is_up(self, mm):
+        res = check_device_status(self.ipv4_addr)
+        self.assertEqual(res, "Online")
 
-    def test_host_ipv4_is_down(self):
-        pass
+    @patch('os.system', return_value=1)
+    def test_host_ipv4_is_down(self, mm):
+        res = check_device_status(self.ipv4_addr)
+        self.assertEqual(res, "Offline")
 
-    def test_host_ipv6_is_up(self):
-        pass
+    @patch('os.system', return_value=0)
+    def test_host_ipv6_is_up(self, mm):
+        res = check_device_status(self.ipv6_addr)
+        self.assertEqual(res, "Online")
 
-    def test_host_ipv6_is_down(self):
-        pass
-
+    @patch('os.system', return_value=1)
+    def test_host_ipv6_is_down(self, mm):
+        res = check_device_status(self.ipv6_addr)
+        self.assertEqual(res, "Offline")
