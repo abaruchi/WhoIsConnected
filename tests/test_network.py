@@ -1,7 +1,7 @@
 import unittest
 from ipaddress import IPv4Address, IPv6Address
-from unittest import mock
 from unittest.mock import patch
+
 import requests_mock
 
 from utils.network import check_device_status, get_mac_vendor
