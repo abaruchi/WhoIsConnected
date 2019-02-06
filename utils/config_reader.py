@@ -51,3 +51,12 @@ class ConfigData(object):
                                                 'network',
                                                 'MAC_URL')
         return config_data
+
+    def get_daemon_info(self):
+        config_data = {
+            'daemon': dict()
+        }
+        config_data['daemon']['probe_min'] = self.config.get(
+                                                 'daemon',
+                                                 'PROBING_MIN')
+        return config_data
