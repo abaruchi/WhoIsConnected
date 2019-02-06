@@ -13,7 +13,6 @@ from .config_reader import ConfigData
 class Gmail(object):
     def __init__(self, devices_data):
         config = ConfigData()
-        # print(device_list['changed_devices'][0].mac_addr)
         self.config_email = config.get_gmail_info()
         self.devices_data = devices_data
 
@@ -35,7 +34,7 @@ class Gmail(object):
         if message is None:
             for device_stat in self.devices_data.keys():
                 if device_stat == "changed_devices":
-                    body = "<p><b>Devices Changed Status:</b><br />"
+                    body += "<p><b>Devices Changed Status:</b><br />"
                     body += "<ul>"
                     for i, device in enumerate(self.devices_data[device_stat]):
                         body += "<li> Device {}: {} / {} / {}".format(
@@ -43,8 +42,9 @@ class Gmail(object):
                             device.ip_addr_v4, device.cur_status)
                     body += "</ul>"
                     body += "</p>"
+
                 if device_stat == "new_devices":
-                    body = "<p><b>New Devices:</b><br />"
+                    body += "<p><b>New Devices:</b><br />"
                     body += "<ul>"
                     for i, device in enumerate(self.devices_data[device_stat]):
                         body += "<li> Device {}: {} / {} / {}".format(
