@@ -47,7 +47,7 @@ def populate__device_info():
                     id=uuid4(),
                     lease_time=devices_in_lease[mac_addr]['lease_time'],
                     time=datetime.datetime.now(),
-                    transaction=transaction,
+                    transition=transaction,
                     device=device
                 )
                 dev['changed_devices'].append(device)
@@ -75,4 +75,6 @@ def populate__device_info():
             dev['new_devices'].append(new_device)
 
     return dev
+
+
 
