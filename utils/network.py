@@ -57,3 +57,5 @@ def check_device_status(ip_addr):
         if r == 0:
             return "Online"
         return "Offline"
+
+    return "Unknown"
