@@ -12,7 +12,7 @@ db.bind('sqlite',
 
 class Device(db.Entity):
     """
-    Class to keep tracking of status changing over time
+    Class to handle Devices connected in DHCP
     """
     mac_addr = PrimaryKey(str)
     name = Required(str)
@@ -25,7 +25,7 @@ class Device(db.Entity):
 
 class ConnectTime(db.Entity):
     """
-    Class to handle Devices running
+    Class to keep tracking of status changing over time
     """
     id = PrimaryKey(UUID)
     lease_time = Required(str)
