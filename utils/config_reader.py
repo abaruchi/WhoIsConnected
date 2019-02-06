@@ -32,6 +32,9 @@ class ConfigData(object):
         config_data['gmail']['user'] = self.config.get(
                                                 'gmail',
                                                 'USER')
+        config_data['gmail']['dest'] = self.config.get(
+                                                'gmail',
+                                                'DEST')
         config_data['gmail']['pass'] = self.config.get(
                                                 'gmail',
                                                 'PASS')
