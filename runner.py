@@ -1,12 +1,14 @@
 """ Main script to run WhoIsConnected
 """
-from pony.orm import db_session, select
-
-from core.models import Device, ConnectTime
-from utils import dhcp, email, network
+import datetime
+from ipaddress import IPv4Address, IPv6Address
+from time import sleep
 from uuid import uuid4
 
-import datetime
+from pony.orm import db_session
+
+from core.models import ConnectTime, Device
+from utils import dhcp, email, network, config_reader
 
 
 @db_session
@@ -30,10 +32,10 @@ def populate__device_info():
             device = Device.get(mac_addr=mac_addr)
             if device.ip_addr_v4 is not None:
                 cur_device_status = network.check_device_status(
-                    device.ip_addr_v4)
+                    IPv4Address(device.ip_addr_v4))
             elif device.ip_addr_v6 is not None:
                 cur_device_status = network.check_device_status(
-                    device.ip_addr_v6
+                    IPv6Address(device.ip_addr_v6)
                 )
             else:
                 continue
@@ -77,4 +79,40 @@ def populate__device_info():
     return dev
 
 
+def mail_to_user(devices_data):
+    """
+    Routine that sends email to the user when something is detected
+    :param devices_data: (dict) A dict returned
+    :return:
+    """
+    possible_status = ['changed_devices', 'new_devices']
 
+    if sorted(possible_status) == sorted(devices_data.keys()):
+        if len(devices_data['changed_devices']) > 0 or \
+                len(devices_data['new_devices']) > 0:
+            mail_to_send = email.Gmail(devices_data)
+            mail_to_send.send_message()
+        else:
+            return None
+    else:
+        mail_to_send = email.Gmail(devices_data)
+        message = "Wrong Status Detected, please check: "
+        message += ','.join(devices_data.keys())
+        mail_to_send.send_message(message=message)
+
+    return None
+
+
+def main():
+    conf = config_reader.ConfigData()
+    daemon_conf = conf.get_daemon_info()
+
+    while True:
+        devices = populate__device_info()
+        mail_to_user(devices)
+
+        sleep(int(daemon_conf['daemon']['probe_min'])*60)
+
+
+if __name__ == '__main__':
+    main()
