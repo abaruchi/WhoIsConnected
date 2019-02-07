@@ -14,7 +14,7 @@ class TestDHCP(unittest.TestCase):
 
     def test_ipv4_parsing(self):
         ipv4_count = 0
-        for k, v in self.dhcp_data.items():
+        for v in self.dhcp_data.values():
             if v.get('ipv4'):
                 if isinstance(v['ipv4'], IPv4Address):
                     ipv4_count += 1
@@ -23,7 +23,7 @@ class TestDHCP(unittest.TestCase):
 
     def test_ipv6_parsing(self):
         ipv6_count = 0
-        for k, v in self.dhcp_data.items():
+        for v in self.dhcp_data.values():
             if v.get('ipv6'):
                 if isinstance(v['ipv6'], IPv6Address):
                     ipv6_count += 1
