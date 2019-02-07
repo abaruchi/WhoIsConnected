@@ -35,8 +35,7 @@ def populate__device_info():
                     IPv4Address(device.ip_addr_v4))
             elif device.ip_addr_v6 is not None:
                 cur_device_status = network.check_device_status(
-                    IPv6Address(device.ip_addr_v6)
-                )
+                    IPv6Address(device.ip_addr_v6))
             else:
                 continue
 
@@ -62,12 +61,13 @@ def populate__device_info():
                 ip6 = devices_in_lease[mac_addr]['ipv6']
             else:
                 ip6 = None
-
             new_device = Device(mac_addr=mac_addr,
                                 name=devices_in_lease[mac_addr]['hostname'],
                                 cur_status=network.check_device_status(ip4),
-                                ip_addr_v4=str(ip4),
-                                ip_addr_v6=str(ip6))
+                                ip_addr_v4=str(ip4) if ip4 is not None
+                                else None,
+                                ip_addr_v6=str(ip6) if ip6 is not None
+                                else None)
             new_device.eth_vendor = network.get_mac_vendor(mac_addr)
 
             ConnectTime(id=uuid4(),
