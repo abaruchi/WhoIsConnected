@@ -34,7 +34,7 @@ class TestNetwork(unittest.TestCase):
 
     def test_invalid_mac_addr(self):
         vendor = get_mac_vendor(self.invalid_mac_addr)
-        self.assertEqual(vendor, "None")
+        self.assertEqual(vendor, "Unknown")
 
     def test_unknown_vendor(self):
         unknown_vendor = {"result":
@@ -44,7 +44,7 @@ class TestNetwork(unittest.TestCase):
             m.get('http://macvendors.co/api/' + self.wrong_mac_vendor,
                   json=unknown_vendor)
             vendor = get_mac_vendor(self.wrong_mac_vendor)
-        self.assertEqual(vendor, "None")
+        self.assertEqual(vendor, "Unknown")
 
     @patch('os.system', return_value=0)
     def test_host_ipv4_is_up(self, mm):
