@@ -23,7 +23,7 @@ def get_mac_vendor(mac_addr):
     mac_validation = re.compile(mac_regex.mac_addr())
 
     if not mac_validation.match(mac_addr):
-        return "None"
+        return "Unknown"
 
     config = ConfigData()
     network_config = config.get_network_info()
@@ -33,7 +33,7 @@ def get_mac_vendor(mac_addr):
     try:
         response = r.json()['result']['company']
     except KeyError:
-        return "None"
+        return "Unknown"
     return response
 
 
