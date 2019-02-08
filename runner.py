@@ -1,27 +1,120 @@
 """ Main script to run WhoIsConnected
 """
 import datetime
-from ipaddress import IPv4Address, IPv6Address
+from enum import Enum
 from time import sleep
 from uuid import uuid4
 
 import daemon
-from pony.orm import db_session
+from pony.orm import db_session, select
 
-from core.models import ConnectTime, Device
+from core.models import ConnectTime, Device, IPLease
 from utils import config_reader, dhcp, email, network
 
 
-@db_session
-def populate__device_info():
-    """
-    Populate Devices DB with devices information
+class Transition(Enum):
+    Off_to_On = 0
+    On_to_Off = 1
+    Unknown = 2
 
-    :return: All devices changed or added to the DB (dict)
-    {
-        'new_devices': list(),
-        'changed_devices': list()
-    }
+
+@db_session
+def add_new_device(mac_addr, device_data):
+    """
+    Adds a new device to the Data Base if not exists
+    :param device_data:
+    :return: The Device object
+    """
+    ip4 = device_data['ipv4'] if device_data.get('ipv4') else None
+    ip6 = device_data['ipv6'] if device_data.get('ipv6') else None
+
+    ip4_status = network.check_device_status(ip4)
+    ip6_status = network.check_device_status(ip6)
+
+    if ip4_status == 'Online' or ip6_status == 'Online':
+        cur_status = 'Online'
+    else:
+        cur_status = 'Offline'
+
+    new_device = Device(
+        mac_addr=mac_addr,
+        name=device_data['hostname'],
+        eth_vendor=network.get_mac_vendor(mac_addr),
+        cur_status=cur_status
+    )
+    ConnectTime(
+        id=uuid4(),
+        lease_time=device_data['lease_time'],
+        time=datetime.datetime.now(),
+        transition=Transition.Unknown.value,
+        device=new_device
+    )
+    IPLease(
+        id=uuid4(),
+        ipv4=str(ip4) if ip4 is not None else None,
+        ipv6=str(ip6) if ip6 is not None else None,
+        current=True,
+        device=new_device
+    )
+    return new_device
+
+
+@db_session
+def updated_device_data(device, data_dict):
+    """
+    If a device already exists in database this routine will check if something
+    has changed. If so, perform the proper updates.
+    :param device: A device ORM to check possible updated
+    :param data_dict: A dict with some data from dhcp_lease file to check
+    :return: The object if this was updated or None
+    """
+    updated = False
+    ip_lease_query = select(il for il in IPLease if il.device == device and
+                      il.current)
+
+    # Updates IPLease data if necessary
+    if ip_lease_query.count() > 0:
+        ip_lease = ip_lease_query.first()
+        if str(data_dict['ipv4']) != ip_lease.ipv4 or \
+            str(data_dict['ipv6']) != ip_lease.ipv6:
+            ip_lease.current = False
+            IPLease(
+                id=uuid4(),
+                ipv4=str(data_dict['ipv4']),
+                ipv6=str(data_dict['ipv6']),
+                current=True,
+                device=device
+            )
+            updated = True
+
+    # Updates Connection Infor if necessary
+    device_status_v4 = network.check_device_status(data_dict['ipv4'])
+    device_status_v6 = network.check_device_status(data_dict['ipv6'])
+    device_status = 'Online' if device_status_v4 == 'Online' or \
+                                device_status_v6 == 'Online' else 'Offline'
+    if device_status != device.cur_status:
+        ConnectTime(
+            id=uuid4(),
+            lease_time=data_dict['lease_time'],
+            time=datetime.datetime.now(),
+            transition=Transition.Off_to_On.value if device_status == 'Online'
+            else Transition.On_to_Off.value,
+            device=device
+        )
+        device.cur_status = device_status
+        updated = True
+
+    if updated:
+        return device
+    else:
+        return None
+
+
+@db_session
+def device_check():
+    """
+    Check if a device exists or not in database and call proper routines
+    :return: A dict with devices changed and/or added
     """
     dev = {
         'new_devices': list(),
@@ -30,50 +123,22 @@ def populate__device_info():
     devices_in_lease = dhcp.parse_dhcp_lease_file()
     for mac_addr in devices_in_lease.keys():
         if Device.exists(mac_addr=mac_addr):
-            device = Device.get(mac_addr=mac_addr)
-            if device.ip_addr_v4 != 'None':
-                cur_device_status = network.check_device_status(
-                    IPv4Address(device.ip_addr_v4))
-            elif device.ip_addr_v6 != 'None':
-                cur_device_status = network.check_device_status(
-                    IPv6Address(device.ip_addr_v6))
-            else:
-                continue
+            cur_device = Device.get(mac_addr=mac_addr)
+            device_data = {
+                'lease_time': devices_in_lease[mac_addr]['lease_time'],
+                'ipv4': devices_in_lease[mac_addr]['ipv4'] if
+                devices_in_lease[mac_addr].get('ipv4') else None,
+                'ipv6': devices_in_lease[mac_addr]['ipv6'] if
+                devices_in_lease[mac_addr].get('ipv6') else None
+            }
+            update_device = updated_device_data(cur_device, device_data)
+            if update_device is not None:
+                dev['changed_devices'].append(update_device)
 
-            if cur_device_status != device.cur_status:
-                if device.cur_status == 'Offline':
-                    transaction = 1
-                else:
-                    transaction = 0
-                ConnectTime(
-                    id=uuid4(),
-                    lease_time=devices_in_lease[mac_addr]['lease_time'],
-                    time=datetime.datetime.now(),
-                    transition=transaction,
-                    device=device
-                )
-                dev['changed_devices'].append(device)
         else:
-            if devices_in_lease[mac_addr].get('ipv4'):
-                ip4 = devices_in_lease[mac_addr]['ipv4']
-            else:
-                ip4 = None
-            if devices_in_lease[mac_addr].get('ipv6'):
-                ip6 = devices_in_lease[mac_addr]['ipv6']
-            else:
-                ip6 = None
-            new_device = Device(mac_addr=mac_addr,
-                                name=devices_in_lease[mac_addr]['hostname'],
-                                cur_status=network.check_device_status(ip4),
-                                ip_addr_v4=str(ip4),
-                                ip_addr_v6=str(ip6))
-            new_device.eth_vendor = network.get_mac_vendor(mac_addr)
-
-            ConnectTime(id=uuid4(),
-                        lease_time=devices_in_lease[mac_addr]['lease_time'],
-                        device=new_device,
-                        time=datetime.datetime.now())
-            dev['new_devices'].append(new_device)
+            device_added = add_new_device(mac_addr, devices_in_lease[mac_addr])
+            if device_added is not None:
+                dev['new_devices'].append(device_added)
 
     return dev
 
@@ -108,7 +173,7 @@ def main():
     daemon_conf = conf.get_daemon_info()
     with daemon.DaemonContext():
         while True:
-            devices = populate__device_info()
+            devices = device_check()
             mail_to_user(devices)
             sleep(int(daemon_conf['daemon']['probe_min'])*60)
 
