@@ -3,34 +3,36 @@ from uuid import UUID
 
 from pony.orm import Database, Optional, PrimaryKey, Required, Set, sql_debug
 
-
 db = Database()
 db.bind('sqlite',
         'whoisconnected',
         create_db=True)
 
+db = Database()
+
 
 class Device(db.Entity):
-    """
-    Class to handle Devices connected in DHCP
-    """
     mac_addr = PrimaryKey(str)
-    name = Required(str)
-    ip_addr_v4 = Optional(str)
-    ip_addr_v6 = Optional(str)
+    name = Optional(str)
     eth_vendor = Optional(str)
-    cur_status = Required(str)
+    cur_status = Optional(str)
     connect_times = Set('ConnectTime')
+    ip_leases = Set('IPLease')
 
 
 class ConnectTime(db.Entity):
-    """
-    Class to keep tracking of status changing over time
-    """
-    id = PrimaryKey(UUID)
-    lease_time = Required(str)
+    id = PrimaryKey(UUID, auto=True)
+    lease_time = Optional(str)
     time = Required(datetime)
-    transition = Optional(int, default=0)
+    transition = Optional(str)  # 0 - Offline to Online, 1 - Online to Offline
+    device = Required(Device)
+
+
+class IPLease(db.Entity):
+    id = PrimaryKey(UUID, auto=True)
+    IPv4Addr = Optional(str, nullable=True)
+    IPv6Addr = Optional(str, nullable=True)
+    Current = Optional(bool)  # Indicates if this IPLease is the current assigned IP Addr
     device = Required(Device)
 
 
