@@ -3,3 +3,4 @@ google-api-python-client==1.7.7
 configparser==3.7.1
 requests==2.21.0
 requests-mock==1.5.2
+python-daemon==2.2.3

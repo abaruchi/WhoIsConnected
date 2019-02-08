@@ -5,10 +5,11 @@ from ipaddress import IPv4Address, IPv6Address
 from time import sleep
 from uuid import uuid4
 
+import daemon
 from pony.orm import db_session
 
 from core.models import ConnectTime, Device
-from utils import dhcp, email, network, config_reader
+from utils import config_reader, dhcp, email, network
 
 
 @db_session
@@ -102,14 +103,14 @@ def mail_to_user(devices_data):
 
 
 def main():
+
     conf = config_reader.ConfigData()
     daemon_conf = conf.get_daemon_info()
-
-    while True:
-        devices = populate__device_info()
-        mail_to_user(devices)
-
-        sleep(int(daemon_conf['daemon']['probe_min'])*60)
+    with daemon.DaemonContext():
+        while True:
+            devices = populate__device_info()
+            mail_to_user(devices)
+            sleep(int(daemon_conf['daemon']['probe_min'])*60)
 
 
 if __name__ == '__main__':
