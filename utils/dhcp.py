@@ -44,12 +44,11 @@ def parse_dhcp_lease_file(dhcp_file=None):
                     dhcp_data[entry[1]]['ipv6'] = IPv6Address(entry[2])
             else:
                 dhcp_data[entry[1]] = {
-                    'lease_time': entry[0],
+                    'lease_time': int(entry[0]),
                     'hostname': entry[3].capitalize()
                 }
                 if ipv4_validation.match(entry[2]):
                     dhcp_data[entry[1]]['ipv4'] = IPv4Address(entry[2])
                 if ipv6_validation.match(entry[2]):
                     dhcp_data[entry[1]]['ipv6'] = IPv6Address(entry[2])
-
     return dhcp_data
