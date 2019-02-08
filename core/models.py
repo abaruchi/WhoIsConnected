@@ -32,7 +32,8 @@ class IPLease(db.Entity):
     id = PrimaryKey(UUID, auto=True)
     IPv4Addr = Optional(str, nullable=True)
     IPv6Addr = Optional(str, nullable=True)
-    Current = Optional(bool)  # Indicates if this IPLease is the current assigned IP Addr
+    # Indicates if this IPLease is the current assigned IP Addr
+    Current = Optional(bool)
     device = Required(Device)
 
 
