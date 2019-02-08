@@ -23,7 +23,7 @@ class ConnectTime(db.Entity):
     id = PrimaryKey(UUID, auto=True)
     lease_time = Optional(int)
     time = Required(datetime)
-    transition = Optional(str)  # 0 - Offline to Online, 1 - Online to Offline
+    transition = Optional(int)
     device = Required(Device)
 
 
