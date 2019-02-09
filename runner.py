@@ -9,6 +9,7 @@ import daemon
 from pony.orm import db_session, select
 
 from core.models import ConnectTime, Device, IPLease
+from core.views import last_ip_lease
 from utils import config_reader, dhcp, email, network
 
 
@@ -69,15 +70,13 @@ def updated_device_data(device, data_dict):
     :return: The object if this was updated or None
     """
     updated = False
-    ip_lease_query = select(il for il in IPLease if il.device == device and
-                      il.current)
+    last_il = last_ip_lease(device)
 
     # Updates IPLease data if necessary
-    if ip_lease_query.count() > 0:
-        ip_lease = ip_lease_query.first()
-        if str(data_dict['ipv4']) != ip_lease.ipv4 or \
-            str(data_dict['ipv6']) != ip_lease.ipv6:
-            ip_lease.current = False
+    if last_il is not None:
+        if str(data_dict['ipv4']) != last_il.ipv4 or \
+                str(data_dict['ipv6']) != last_il.ipv6:
+            last_il.current = False
             IPLease(
                 id=uuid4(),
                 ipv4=str(data_dict['ipv4']),

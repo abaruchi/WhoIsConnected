@@ -4,7 +4,7 @@ import smtplib
 
 from pony.orm import db_session
 
-from core.models import ConnectTime, Device
+from core.views import last_ip_lease
 
 from .config_reader import ConfigData
 
@@ -37,9 +37,10 @@ class Gmail(object):
                     body += "<p><b>Devices Changed Status:</b><br />"
                     body += "<ul>"
                     for i, device in enumerate(self.devices_data[device_stat]):
+                        ip_lease = last_ip_lease(device)
                         body += "<li> Device {}: {} / {} / {}".format(
                             i, device.name,
-                            device.ip_addr_v4, device.cur_status)
+                            ip_lease.ipv4, device.cur_status)
                     body += "</ul>"
                     body += "</p>"
 
@@ -47,9 +48,10 @@ class Gmail(object):
                     body += "<p><b>New Devices:</b><br />"
                     body += "<ul>"
                     for i, device in enumerate(self.devices_data[device_stat]):
+                        ip_lease = last_ip_lease(device)
                         body += "<li> Device {}: {} / {} / {}".format(
                             i, device.name,
-                            device.ip_addr_v4, device.cur_status)
+                            ip_lease.ipv4, device.cur_status)
                     body += "</ul>"
                     body += "</p>"
         else:
