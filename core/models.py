@@ -11,26 +11,27 @@ db.bind('sqlite',
 
 
 class Device(db.Entity):
-    """
-    Class to handle Devices connected in DHCP
-    """
     mac_addr = PrimaryKey(str)
-    name = Required(str)
-    ip_addr_v4 = Optional(str)
-    ip_addr_v6 = Optional(str)
+    name = Optional(str)
     eth_vendor = Optional(str)
-    cur_status = Required(str)
+    cur_status = Optional(str)
     connect_times = Set('ConnectTime')
+    ip_leases = Set('IPLease')
 
 
 class ConnectTime(db.Entity):
-    """
-    Class to keep tracking of status changing over time
-    """
-    id = PrimaryKey(UUID)
-    lease_time = Required(str)
+    id = PrimaryKey(UUID, auto=True)
+    lease_time = Optional(int)
     time = Required(datetime)
-    transition = Optional(int, default=0)
+    transition = Optional(int)
+    device = Required(Device)
+
+
+class IPLease(db.Entity):
+    id = PrimaryKey(UUID, auto=True)
+    ipv4 = Optional(str, nullable=True)
+    ipv6 = Optional(str, nullable=True)
+    current = Optional(bool)
     device = Required(Device)
 
 
