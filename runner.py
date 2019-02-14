@@ -167,13 +167,17 @@ def mail_to_user(devices_data):
 
 
 def main():
+    db = define_db(
+        provider='sqlite',
+        filename='whoisconnected',
+        create_db=True)
 
     conf = config_reader.ConfigData()
     daemon_conf = conf.get_daemon_info()
     with daemon.DaemonContext():
         while True:
-            devices = device_check()
-            mail_to_user(devices)
+            devices = device_check(db)
+            mail_to_user(devices, db)
             sleep(int(daemon_conf['daemon']['probe_min'])*60)
 
 
