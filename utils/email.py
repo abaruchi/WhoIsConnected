@@ -11,10 +11,11 @@ from .config_reader import ConfigData
 
 @db_session
 class Gmail(object):
-    def __init__(self, devices_data):
+    def __init__(self, devices_data, db):
         config = ConfigData()
         self.config_email = config.get_gmail_info()
         self.devices_data = devices_data
+        self.db = db
 
         self.server = 'smtp.gmail.com'
         self.port = 587
@@ -28,6 +29,7 @@ class Gmail(object):
                       self.config_email['gmail']['pass'])
         self.session = session
 
+    @db_session
     def send_message(self, message=None):
 
         body = ""
@@ -37,7 +39,7 @@ class Gmail(object):
                     body += "<p><b>Devices Changed Status:</b><br />"
                     body += "<ul>"
                     for i, device in enumerate(self.devices_data[device_stat]):
-                        ip_lease = last_ip_lease(device)
+                        ip_lease = last_ip_lease(device, self.db)
                         body += "<li> Device {}: {} / {} / {}".format(
                             i, device.name,
                             ip_lease.ipv4, device.cur_status)
@@ -48,7 +50,7 @@ class Gmail(object):
                     body += "<p><b>New Devices:</b><br />"
                     body += "<ul>"
                     for i, device in enumerate(self.devices_data[device_stat]):
-                        ip_lease = last_ip_lease(device)
+                        ip_lease = last_ip_lease(device, self.db)
                         body += "<li> Device {}: {} / {} / {}".format(
                             i, device.name,
                             ip_lease.ipv4, device.cur_status)
