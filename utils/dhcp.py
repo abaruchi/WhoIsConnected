@@ -33,7 +33,8 @@ def parse_dhcp_lease_file(dhcp_file=None):
         dhcp_lease_entries = [line.strip().split() for line in f]
 
     for entry in dhcp_lease_entries:
-        if entry[0] != 'duid':
+        if entry[0] != 'duid' and entry[3].lower() not in \
+                dhcp_config['dhcp']['ignore_hosts']:
             ipv4_validation = re.compile(ip_regex.ipv4_regex())
             ipv6_validation = re.compile(ip_regex.ipv6_regex())
             if dhcp_data.get(entry[1]):
