@@ -6,7 +6,7 @@ from time import sleep
 from uuid import uuid4
 
 import daemon
-from pony.orm import db_session, select
+from pony.orm import db_session
 
 from core.models import define_db
 from core.views import last_ip_lease
