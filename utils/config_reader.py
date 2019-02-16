@@ -19,9 +19,11 @@ class ConfigData(object):
         config_data['dhcp']['lease_file'] = self.config.get(
                                                         'dhcp',
                                                         'LEASE_FILE')
-        config_data['dhcp']['know_devices'] = self.config.get(
+        config_data['dhcp']['ignore_hosts'] = self.config.get(
                                                         'dhcp',
-                                                        'KNOW_DEVICES')
+                                                        'IGNORE_HOSTS').\
+            lower().replace(' ', '').split(',')
+
         return config_data
 
     def get_gmail_info(self):
