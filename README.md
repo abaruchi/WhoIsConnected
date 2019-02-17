@@ -6,7 +6,9 @@
 1. [Introduction](#introduction)
 2. [How to Install](#how-to-install)
 3. [Implementation Details](#implementation-details)
-4. [How to Contribute](#How-to-contribute)
+4. [Running Tests](#running-tests)
+5. [How to Contribute](#How-to-contribute)
+
 
 
 ## Introduction
@@ -74,6 +76,50 @@ The code is structured in the following directories:
 - `tests/`: Contains Unit Tests for the project;
 
 - `utils/`: Contains scripts related to specific tasks, such as send email, check device status, read the config file and so on.
+
+
+## Running Tests
+In order to run unit tests, follow the steps below.
+
+Go to tests directory.
+
+```bash
+cd tests/
+```
+
+Run the pytest command:
+
+```bash
+pytest
+```
+
+You should see an output as follow:
+
+```bash
+============================================================================================= test session starts ==============================================================================================
+platform darwin -- Python 3.6.0, pytest-4.2.0, py-1.7.0, pluggy-0.8.1
+rootdir: /Users/abaruchi/Projects/Personal/WhoIsConnected, inifile:
+plugins: requests-mock-1.5.2
+collected 16 items
+
+test_dhcp.py ....                                                                                                                                                                                        [ 25%]
+test_network.py .......                                                                                                                                                                                  [ 68%]
+test_runner.py .....                                                                                                                                                                                     [100%]
+
+========================================================================================== 16 passed in 95.97 seconds ==========================================================================================
+```
+
+It is possible to run with coverage:
+
+```bash
+coverage run /Library/Frameworks/Python.framework/Versions/3.6/bin/pytest
+```
+
+After that, you can generate the XML file to upload to your CI/CD server.
+
+```bash
+coverage xml -i
+```
 
 
 ## How to Contribute
