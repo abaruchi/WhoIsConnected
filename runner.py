@@ -161,12 +161,12 @@ def mail_to_user(devices_data, db):
     if sorted(possible_status) == sorted(devices_data.keys()):
         if len(devices_data['changed_devices']) > 0 or \
                 len(devices_data['new_devices']) > 0:
-            mail_to_send = email.Gmail(devices_data, db)
+            mail_to_send = email.SendMAIL(devices_data, db)
             mail_to_send.send_message()
         else:
             return None
     else:
-        mail_to_send = email.Gmail(devices_data, db)
+        mail_to_send = email.SendMAIL(devices_data, db)
         message = "Wrong Status Detected, please check: "
         message += ','.join(devices_data.keys())
         mail_to_send.send_message(message=message)
