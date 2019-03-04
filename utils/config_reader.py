@@ -13,52 +13,60 @@ class ConfigData(object):
         self.config.read(self.config_file)
 
     def get_dhcp_info(self):
+        current_key = 'dhcp'
         config_data = {
-            'dhcp': dict()
+            current_key: dict()
         }
-        config_data['dhcp']['lease_file'] = self.config.get(
-                                                        'dhcp',
+        config_data[current_key]['lease_file'] = self.config.get(
+                                                        current_key,
                                                         'LEASE_FILE')
-        config_data['dhcp']['ignore_hosts'] = self.config.get(
-                                                        'dhcp',
+        config_data[current_key]['ignore_hosts'] = self.config.get(
+                                                        current_key,
                                                         'IGNORE_HOSTS').\
             lower().replace(' ', '').split(',')
 
         return config_data
 
-    def get_gmail_info(self):
+    def get_email_info(self):
+        current_key = 'email'
         config_data = {
-            'gmail': dict()
+            current_key: dict()
         }
 
-        config_data['gmail']['user'] = self.config.get(
-                                                'gmail',
-                                                'USER')
-        config_data['gmail']['dest'] = self.config.get(
-                                                'gmail',
+        config_data[current_key]['access_key'] = self.config.get(
+                                                current_key,
+                                                'ACCESS_KEY')
+        config_data[current_key]['dest'] = self.config.get(
+                                                current_key,
                                                 'DEST')
-        config_data['gmail']['pass'] = self.config.get(
-                                                'gmail',
-                                                'PASS')
-        config_data['gmail']['subject'] = self.config.get(
-                                                'gmail',
+        config_data[current_key]['secret_key'] = self.config.get(
+                                                current_key,
+                                                'SECRET_KEY')
+        config_data[current_key]['subject'] = self.config.get(
+                                                current_key,
                                                 'SUBJECT')
+        config_data[current_key]['sender'] = self.config.get(
+                                                current_key,
+                                                'SENDER')
+
         return config_data
 
     def get_network_info(self):
+        current_key = 'network'
         config_data = {
-            'network': dict()
+            current_key: dict()
         }
-        config_data['network']['mac_url'] = self.config.get(
-                                                'network',
+        config_data[current_key]['mac_url'] = self.config.get(
+                                                current_key,
                                                 'MAC_URL')
         return config_data
 
     def get_daemon_info(self):
+        current_key = 'daemon'
         config_data = {
-            'daemon': dict()
+            current_key: dict()
         }
-        config_data['daemon']['probe_min'] = self.config.get(
-                                                 'daemon',
+        config_data[current_key]['probe_min'] = self.config.get(
+                                                 current_key,
                                                  'PROBING_MIN')
         return config_data

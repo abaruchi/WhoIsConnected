@@ -1,7 +1,6 @@
 """ Routines and Classes to inform the user about new Device on Network
 """
-import smtplib
-
+import boto3
 from pony.orm import db_session
 
 from core.views import last_ip_lease
@@ -10,33 +9,36 @@ from .config_reader import ConfigData
 
 
 @db_session
-class Gmail(object):
+class SendMAIL(object):
     def __init__(self, devices_data, db):
         config = ConfigData()
-        self.config_email = config.get_gmail_info()
+        self.config_email = config.get_email_info()
         self.devices_data = devices_data
         self.db = db
 
-        self.server = 'smtp.gmail.com'
-        self.port = 587
-        session = smtplib.SMTP(
-            self.server, self.port
+        user = self.config_email['email']['access_key']
+        password = self.config_email['email']['secret_key']
+
+        self.client = boto3.client(
+            service_name='ses',
+            region_name='eu-west-1',
+            aws_access_key_id=user,
+            aws_secret_access_key=password
         )
-        session.ehlo()
-        session.starttls()
-        session.ehlo
-        session.login(self.config_email['gmail']['user'],
-                      self.config_email['gmail']['pass'])
-        self.session = session
 
     @db_session
     def send_message(self, message=None):
+        destination = {
+            'ToAddresses': self.config_email['email']['dest'].
+                replace(' ', '').split(',')
+        }
+        source = self.config_email['email']['sender']
 
-        body = ""
         if message is None:
+            body = ''
             for device_stat in self.devices_data.keys():
                 if device_stat == "changed_devices":
-                    body += "<p><b>Devices Changed Status:</b><br />"
+                    body += "<p><b>Devices Changed Status:</b><br/>"
                     body += "<ul>"
                     for i, device in enumerate(self.devices_data[device_stat]):
                         ip_lease = last_ip_lease(device, self.db)
@@ -56,18 +58,16 @@ class Gmail(object):
                             ip_lease.ipv4, device.cur_status)
                     body += "</ul>"
                     body += "</p>"
+
         else:
             body = message
 
-        headers = [
-            "From: " + self.config_email['gmail']['user'],
-            "Subject: " + self.config_email['gmail']['subject'],
-            "To: " + self.config_email['gmail']['dest'],
-            "Content-Type: text/html"
-        ]
-        headers = "\r\n".join(headers)
-        self.session.sendmail(
-            self.config_email['gmail']['user'],
-            self.config_email['gmail']['user'],
-            headers + "\r\n\r\n" + body
+        message_dict = {
+            'Subject': {'Data': self.config_email['email']['subject']},
+            'Body': {'Html': {'Data': body}}
+        }
+        self.client.send_email(
+            Source=source,
+            Destination=destination,
+            Message=message_dict
         )
