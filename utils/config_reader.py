@@ -45,6 +45,10 @@ class ConfigData(object):
         config_data[current_key]['subject'] = self.config.get(
                                                 current_key,
                                                 'SUBJECT')
+        config_data[current_key]['sender'] = self.config.get(
+                                                current_key,
+                                                'SENDER')
+
         return config_data
 
     def get_network_info(self):
