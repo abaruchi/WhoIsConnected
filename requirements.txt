@@ -5,3 +5,4 @@ requests==2.21.0
 requests-mock==1.5.2
 python-daemon==2.2.3
 boto3==1.9.104
+jinja2==2.9.6
