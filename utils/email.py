@@ -1,11 +1,25 @@
 """ Routines and Classes to inform the user about new Device on Network
 """
 import boto3
+from jinja2 import Environment, FileSystemLoader
 from pony.orm import db_session
 
 from core.views import last_ip_lease
 
 from .config_reader import ConfigData
+
+
+def email_body_generator(devices_dict):
+    """
+
+    :param devices_dict:
+    :return:
+    """
+    template_search_dir = "./templates/"
+    template_loader = FileSystemLoader(searchpath=template_search_dir)
+    template_env = Environment(loader=template_loader)
+
+    return template_env.get_template(TEMPLATE_FILE)
 
 
 @db_session
