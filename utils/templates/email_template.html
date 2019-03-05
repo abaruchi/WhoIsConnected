@@ -1,0 +1,12 @@
+<p><b>Devices Changed Status:</b><br/>
+<ul>
+    {% for device in changed_devices %}
+    <li> Device {{ loop.index }}: {{ device.name }} / {{ device.ip }} / {{ device.status }}
+    {% endfor %}
+</ul>
+<p><b>New Devices:</b><br/>
+<ul>
+    {% for device in new_devices %}
+    <li> Device {{ loop.index }}: {{ device.name }} / {{ device.ip }} / {{ device.status }}
+    {% endfor %}
+</ul>
