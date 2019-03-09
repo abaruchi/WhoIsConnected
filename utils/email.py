@@ -18,7 +18,8 @@ def email_body_generator(device_dict):
     :return:
     """
     this_dir = os.path.dirname(os.path.abspath(__file__))
-    j2_env = Environment(loader=FileSystemLoader(this_dir + '/templates/'))
+    j2_env = Environment(autoescape=True,
+                         loader=FileSystemLoader(this_dir + '/templates/'))
 
     return j2_env.get_template('email_template.html').render(items=device_dict)
 
