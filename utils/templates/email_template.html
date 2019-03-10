@@ -1,7 +1,21 @@
 <p><b>New Devices:</b><br/>
-<ul>{% for device in items.new_devices %}<li> Device {{ loop.index }}: {{ device|upper }} - {{ items.new_devices[device]['ip'] }} - {{ items.new_devices[device]['status'] }} - {{ items.new_devices[device]['name'] }} {% endfor %}</ul>
+<ul>{% for device in items.new_devices %}
+    {% if items.new_devices[device]['status'] == 'Online' %}
+    <li> Device {{ loop.index }}: {{ device|upper }} - {{ items.new_devices[device]['ip'] }} - <font color="blue">Online</font> - {{ items.new_devices[device]['name'] }}
+    {% else %}
+    <li> Device {{ loop.index }}: {{ device|upper }} - {{ items.new_devices[device]['ip'] }} - <font color="red">Offline</font> - {{ items.new_devices[device]['name'] }}
+    {% endif %}
+    {% endfor %}
+</ul>
 <br/>
 <p><b>Devices Changed Status:</b><br/>
-<ul>{% for device in items.changed_devices %}<li> Device {{ loop.index }}: {{ device|upper }} - {{ items.changed_devices[device]['ip'] }} - {{ items.changed_devices[device]['status'] }} - {{ items.changed_devices[device]['name'] }} {% endfor %}</ul>
+<ul>{% for device in items.changed_devices %}
+    {% if items.new_devices[device]['status'] == 'Online' %}
+    <li> Device {{ loop.index }}: {{ device|upper }} - {{ items.new_devices[device]['ip'] }} - <font color="blue">Online</font> - {{ items.new_devices[device]['name'] }}
+    {% else %}
+    <li> Device {{ loop.index }}: {{ device|upper }} - {{ items.new_devices[device]['ip'] }} - <font color="red">Offline</font> - {{ items.new_devices[device]['name'] }}
+    {% endif %}
+    {% endfor %}
+</ul>
 <br/>
 <p><b>Detected By</b> <i>WhoIsConnected</i>
